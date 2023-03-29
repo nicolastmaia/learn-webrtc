@@ -1,4 +1,4 @@
-# WebRTC React Native App with Signaling
+# WebRTC React Native App with Websocket Signaling
 This project was born from the need of using **webrtc** in a **react-native** app while having the signaling done via **websocket**.
 
 It is a mix of two other projects I found online:
