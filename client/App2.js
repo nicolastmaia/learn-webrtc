@@ -1,6 +1,6 @@
 import React from 'react';
 import {Text, View} from 'react-native';
-import App from './App';
+import App from './App3';
 
 export default function App2({}) {
   return (
