@@ -11,17 +11,17 @@ function onMessage(ws, data) {
 
   switch (parsedData.type) {
     case 'register':
-      clients[parsedData.callerId] = ws;
-      console.log(`${parsedData.callerId} registered`);
+      clients[parsedData.userId] = ws;
+      console.log(`${parsedData.userId} registered`);
       break;
     case 'newCall':
-      clients[parsedData.calleeId]?.send(JSON.stringify(parsedData));
+      clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
       break;
     case 'callAnswered':
-      clients[parsedData.callerId]?.send(JSON.stringify(parsedData));
+      clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
       break;
     case 'ICEcandidate':
-      clients[parsedData.calleeId]?.send(JSON.stringify(parsedData));
+      clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
       break;
     case 'cancelCall':
       clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));

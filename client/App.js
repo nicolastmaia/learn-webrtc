@@ -34,7 +34,7 @@ export default function App({wsPort}) {
 
   const [type, setType] = useState('JOIN');
 
-  const [callerId] = useState(
+  const [userId] = useState(
     Math.floor(100000 + Math.random() * 900000).toString(),
   );
   const otherUserId = useRef(null);
@@ -51,7 +51,7 @@ export default function App({wsPort}) {
 
   useEffect(() => {
     wsConn.current.onopen = msg => {
-      send({type: 'register', callerId});
+      send({type: 'register', userId});
     };
 
     //when we get a message from a signaling server
@@ -180,7 +180,7 @@ export default function App({wsPort}) {
         console.log('FOUND ICE CANDIDATE');
         send({
           type: 'ICEcandidate',
-          calleeId: otherUserId.current,
+          otherUserId: otherUserId.current,
           rtcMessage: {
             label: event.candidate.sdpMLineIndex,
             id: event.candidate.sdpMid,
@@ -242,8 +242,8 @@ export default function App({wsPort}) {
     await peerConnection.current.setLocalDescription(sessionDescription);
     send({
       type: 'newCall',
-      callerId: callerId,
-      calleeId: otherUserId.current,
+      callerId: userId,
+      otherUserId: otherUserId.current,
       rtcMessage: sessionDescription,
     });
   }
@@ -256,7 +256,7 @@ export default function App({wsPort}) {
     await peerConnection.current.setLocalDescription(sessionDescription);
     send({
       type: 'callAnswered',
-      callerId: otherUserId.current,
+      otherUserId: otherUserId.current,
       rtcMessage: sessionDescription,
     });
   }
@@ -322,7 +322,7 @@ export default function App({wsPort}) {
                 color: '#000',
                 letterSpacing: 6,
               }}>
-              {callerId}
+              {userId}
             </Text>
           </View>
         </View>
