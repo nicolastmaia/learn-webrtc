@@ -15,18 +15,18 @@ function onMessage(ws, data) {
       console.log(`${parsedData.callerId} registered`);
       break;
     case 'newCall':
-      clients[parsedData.calleeId].send(JSON.stringify(parsedData));
+      clients[parsedData.calleeId]?.send(JSON.stringify(parsedData));
       break;
     case 'callAnswered':
-      clients[parsedData.callerId].send(JSON.stringify(parsedData));
+      clients[parsedData.callerId]?.send(JSON.stringify(parsedData));
       break;
     case 'ICEcandidate':
-      clients[parsedData.calleeId].send(JSON.stringify(parsedData));
+      clients[parsedData.calleeId]?.send(JSON.stringify(parsedData));
       break;
     case 'cancelCall':
-      clients[parsedData.otherUserId].send(JSON.stringify(parsedData));
+      clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
     case 'endCall':
-      clients[parsedData.otherUserId].send(JSON.stringify(parsedData));
+      clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
       break;
   }
 }
