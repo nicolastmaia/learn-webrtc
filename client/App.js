@@ -1,31 +1,15 @@
 import React, {useEffect, useState, useRef} from 'react';
 import {
-  Platform,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  Keyboard,
-  View,
-  Text,
-  TouchableOpacity,
-} from 'react-native';
-import TextInputContainer from './components/TextInputContainer';
-import SocketIOClient from 'socket.io-client';
-import {
   mediaDevices,
   RTCPeerConnection,
-  RTCView,
   RTCIceCandidate,
   RTCSessionDescription,
 } from 'react-native-webrtc';
-import CallEnd from './asset/CallEnd';
-import CallAnswer from './asset/CallAnswer';
-import MicOn from './asset/MicOn';
-import MicOff from './asset/MicOff';
-import VideoOn from './asset/VideoOn';
-import VideoOff from './asset/VideoOff';
-import CameraSwitch from './asset/CameraSwitch';
-import IconContainer from './components/IconContainer';
 import InCallManager from 'react-native-incall-manager';
+import JoinScreen from './pages/JoinScreen';
+import IncomingCallScreen from './pages/IncomingCallScreen';
+import OutgoingCallScreen from './pages/OutgoingCallScreen';
+import WebrtcRoomScreen from './pages/WebrtcRoomScreen';
 
 export default function App({wsPort}) {
   const [localStream, setlocalStream] = useState(null);
@@ -39,7 +23,7 @@ export default function App({wsPort}) {
   );
   const otherUserId = useRef(null);
 
-  const wsConn = useRef(new WebSocket(`ws://192.168.1.5:${wsPort}`));
+  const wsConn = useRef(new WebSocket(`ws://192.168.1.2:${wsPort}`));
 
   const [localMicOn, setlocalMicOn] = useState(true);
 
@@ -50,7 +34,9 @@ export default function App({wsPort}) {
   let remoteRTCMessage = useRef(null);
 
   useEffect(() => {
+    console.log('primeiro useeffect');
     wsConn.current.onopen = msg => {
+      console.log('on open!');
       send({type: 'register', userId});
     };
 
@@ -238,6 +224,7 @@ export default function App({wsPort}) {
   };
 
   async function processCall() {
+    setType('OUTGOING_CALL');
     const sessionDescription = await peerConnection.current.createOffer();
     await peerConnection.current.setLocalDescription(sessionDescription);
     send({
@@ -259,6 +246,7 @@ export default function App({wsPort}) {
       otherUserId: otherUserId.current,
       rtcMessage: sessionDescription,
     });
+    setType('WEBRTC_ROOM');
   }
 
   async function processCancel() {
@@ -269,8 +257,8 @@ export default function App({wsPort}) {
     });
     otherUserId.current = null;
     setlocalStream(null);
-    setType('JOIN');
     createPeerConnection();
+    setType('JOIN');
   }
 
   function switchCamera() {
@@ -304,312 +292,47 @@ export default function App({wsPort}) {
     createPeerConnection();
   }
 
-  const JoinScreen = () => {
-    return (
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{
-          flex: 1,
-          backgroundColor: '#050A0E',
-          justifyContent: 'center',
-          paddingHorizontal: 42,
-        }}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <>
-            <View
-              style={{
-                padding: 35,
-                backgroundColor: '#1A1C22',
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: 14,
-              }}>
-              <Text
-                style={{
-                  fontSize: 18,
-                  color: '#D0D4DD',
-                }}>
-                Your Caller ID
-              </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  marginTop: 12,
-                  alignItems: 'center',
-                }}>
-                <Text
-                  style={{
-                    fontSize: 32,
-                    color: '#ffff',
-                    letterSpacing: 6,
-                  }}>
-                  {userId}
-                </Text>
-              </View>
-            </View>
-
-            <View
-              style={{
-                backgroundColor: '#1A1C22',
-                padding: 40,
-                marginTop: 25,
-                justifyContent: 'center',
-                borderRadius: 14,
-              }}>
-              <Text
-                style={{
-                  fontSize: 18,
-                  color: '#D0D4DD',
-                }}>
-                Enter call id of another user
-              </Text>
-              <TextInputContainer
-                placeholder={'Enter Caller ID'}
-                value={otherUserId.current}
-                setValue={text => {
-                  otherUserId.current = text;
-                  console.log('TEST', otherUserId.current);
-                }}
-                keyboardType={'number-pad'}
-              />
-              <TouchableOpacity
-                onPress={() => {
-                  setType('OUTGOING_CALL');
-                  processCall();
-                }}
-                style={{
-                  height: 50,
-                  backgroundColor: '#5568FE',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: 12,
-                  marginTop: 16,
-                }}>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    color: '#FFFFFF',
-                  }}>
-                  Call Now
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    );
-  };
-
-  const OutgoingCallScreen = () => {
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'space-around',
-          backgroundColor: '#050A0E',
-        }}>
-        <View
-          style={{
-            padding: 35,
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderRadius: 14,
-          }}>
-          <Text
-            style={{
-              fontSize: 16,
-              color: '#D0D4DD',
-            }}>
-            Calling to...
-          </Text>
-
-          <Text
-            style={{
-              fontSize: 36,
-              marginTop: 12,
-              color: '#ffff',
-              letterSpacing: 6,
-            }}>
-            {otherUserId.current}
-          </Text>
-        </View>
-        <View
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <TouchableOpacity
-            onPress={() => {
-              processCancel();
-              setType('JOIN');
-            }}
-            style={{
-              backgroundColor: '#FF5D5D',
-              borderRadius: 30,
-              height: 60,
-              aspectRatio: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <CallEnd width={50} height={12} />
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  };
-
-  const IncomingCallScreen = () => {
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'space-around',
-          backgroundColor: '#050A0E',
-        }}>
-        <View
-          style={{
-            padding: 35,
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderRadius: 14,
-          }}>
-          <Text
-            style={{
-              fontSize: 36,
-              marginTop: 12,
-              color: '#ffff',
-            }}>
-            {otherUserId.current} is calling..
-          </Text>
-        </View>
-        <View
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <TouchableOpacity
-            onPress={() => {
-              processAccept();
-              setType('WEBRTC_ROOM');
-            }}
-            style={{
-              backgroundColor: 'green',
-              borderRadius: 30,
-              height: 60,
-              aspectRatio: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <CallAnswer height={28} fill={'#fff'} />
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  };
-
-  const WebrtcRoomScreen = () => {
-    return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: '#050A0E',
-          paddingHorizontal: 12,
-          paddingVertical: 12,
-        }}>
-        {localStream ? (
-          <RTCView
-            objectFit={'cover'}
-            style={{flex: 1, backgroundColor: '#050A0E'}}
-            streamURL={localStream.toURL()}
-          />
-        ) : null}
-        {remoteStream ? (
-          <RTCView
-            objectFit={'cover'}
-            style={{
-              flex: 1,
-              backgroundColor: '#050A0E',
-              marginTop: 8,
-            }}
-            streamURL={remoteStream.toURL()}
-          />
-        ) : null}
-        <View
-          style={{
-            marginVertical: 12,
-            flexDirection: 'row',
-            justifyContent: 'space-evenly',
-          }}>
-          <IconContainer
-            backgroundColor={'red'}
-            onPress={() => {
-              endCall();
-            }}
-            Icon={() => {
-              return <CallEnd height={26} width={26} fill="#FFF" />;
-            }}
-          />
-          <IconContainer
-            style={{
-              borderWidth: 1.5,
-              borderColor: '#2B3034',
-            }}
-            backgroundColor={!localMicOn ? '#fff' : 'transparent'}
-            onPress={() => {
-              toggleMic();
-            }}
-            Icon={() => {
-              return localMicOn ? (
-                <MicOn height={24} width={24} fill="#FFF" />
-              ) : (
-                <MicOff height={28} width={28} fill="#1D2939" />
-              );
-            }}
-          />
-          <IconContainer
-            style={{
-              borderWidth: 1.5,
-              borderColor: '#2B3034',
-            }}
-            backgroundColor={!localWebcamOn ? '#fff' : 'transparent'}
-            onPress={() => {
-              toggleCamera();
-            }}
-            Icon={() => {
-              return localWebcamOn ? (
-                <VideoOn height={24} width={24} fill="#FFF" />
-              ) : (
-                <VideoOff height={36} width={36} fill="#1D2939" />
-              );
-            }}
-          />
-          <IconContainer
-            style={{
-              borderWidth: 1.5,
-              borderColor: '#2B3034',
-            }}
-            backgroundColor={'transparent'}
-            onPress={() => {
-              switchCamera();
-            }}
-            Icon={() => {
-              return <CameraSwitch height={24} width={24} fill="#FFF" />;
-            }}
-          />
-        </View>
-      </View>
-    );
+  const updateOtherUserId = text => {
+    otherUserId.current = text;
   };
 
   switch (type) {
     case 'JOIN':
-      return JoinScreen();
+      return (
+        <JoinScreen
+          userId={userId}
+          otherUserId={otherUserId.current}
+          processCall={processCall}
+          updateOtherUserId={updateOtherUserId}
+        />
+      );
     case 'INCOMING_CALL':
-      return IncomingCallScreen();
+      return (
+        <IncomingCallScreen
+          otherUserId={otherUserId.current}
+          processAccept={processAccept}
+        />
+      );
     case 'OUTGOING_CALL':
-      return OutgoingCallScreen();
+      return (
+        <OutgoingCallScreen
+          otherUserId={otherUserId.current}
+          processCancel={processCancel}
+        />
+      );
     case 'WEBRTC_ROOM':
-      return WebrtcRoomScreen();
+      return (
+        <WebrtcRoomScreen
+          localStream={localStream}
+          remoteStream={remoteStream}
+          localMicOn={localMicOn}
+          localWebcamOn={localWebcamOn}
+          toggleMic={toggleMic}
+          toggleCamera={toggleCamera}
+          switchCamera={switchCamera}
+          endCall={endCall}
+        />
+      );
     default:
       return null;
   }
