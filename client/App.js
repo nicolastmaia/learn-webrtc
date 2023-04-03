@@ -50,8 +50,8 @@ export default function App({wsPort}) {
           break;
 
         //when somebody wants to call us
-        case 'callAnswered':
-          handleCallAnswered(data);
+        case 'acceptCall':
+          handleAcceptCall(data);
           break;
 
         //when a remote peer sends an ice candidate to us
@@ -60,7 +60,7 @@ export default function App({wsPort}) {
           break;
 
         //when the other user rejects the call
-        case 'cancelCall':
+        case 'CancelCall':
           handleCancelCall(data);
 
         //when the other user rejects the call
@@ -81,7 +81,7 @@ export default function App({wsPort}) {
       setType('INCOMING_CALL');
     };
 
-    const handleCallAnswered = data => {
+    const handleAcceptCall = data => {
       console.log('\n\n\n\n CALL_ANSWERED \n\n\n\n');
       remoteRTCMessage.current = data.rtcMessage;
       peerConnection.current.setRemoteDescription(
@@ -251,7 +251,7 @@ export default function App({wsPort}) {
     const sessionDescription = await peerConnection.current.createAnswer();
     await peerConnection.current.setLocalDescription(sessionDescription);
     send({
-      type: 'callAnswered',
+      type: 'acceptCall',
       otherUserId: otherUserId.current,
       rtcMessage: sessionDescription,
     });

@@ -18,7 +18,7 @@ function onMessage(ws, data) {
       case 'newCall':
         clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
         break;
-      case 'callAnswered':
+      case 'acceptCall':
         clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
         break;
       case 'ICEcandidate':
