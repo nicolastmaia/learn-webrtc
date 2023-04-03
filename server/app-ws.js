@@ -15,20 +15,7 @@ function onMessage(ws, data) {
         clients[parsedData.userId] = ws;
         console.log(`${parsedData.userId} registered`);
         break;
-      case 'newCall':
-        clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
-        break;
-      case 'acceptCall':
-        clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
-        break;
-      case 'ICEcandidate':
-        clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
-        break;
-      case 'cancelCall':
-        clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
-      case 'rejectCall':
-        clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
-      case 'endCall':
+      default:
         clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
         break;
     }
