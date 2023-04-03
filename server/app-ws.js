@@ -7,27 +7,31 @@ function onError(ws, err) {
 }
 
 function onMessage(ws, data) {
-  const parsedData = JSON.parse(data);
+  try {
+    const parsedData = JSON.parse(data);
 
-  switch (parsedData.type) {
-    case 'register':
-      clients[parsedData.userId] = ws;
-      console.log(`${parsedData.userId} registered`);
-      break;
-    case 'newCall':
-      clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
-      break;
-    case 'callAnswered':
-      clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
-      break;
-    case 'ICEcandidate':
-      clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
-      break;
-    case 'cancelCall':
-      clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
-    case 'endCall':
-      clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
-      break;
+    switch (parsedData.type) {
+      case 'register':
+        clients[parsedData.userId] = ws;
+        console.log(`${parsedData.userId} registered`);
+        break;
+      case 'newCall':
+        clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
+        break;
+      case 'callAnswered':
+        clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
+        break;
+      case 'ICEcandidate':
+        clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
+        break;
+      case 'cancelCall':
+        clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
+      case 'endCall':
+        clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
+        break;
+    }
+  } catch (error) {
+    console.log(data.toString());
   }
 }
 
