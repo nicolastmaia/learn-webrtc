@@ -34,9 +34,7 @@ export default function App({wsPort}) {
   let remoteRTCMessage = useRef(null);
 
   useEffect(() => {
-    console.log('primeiro useeffect');
     wsConn.current.onopen = msg => {
-      console.log('on open!');
       send({type: 'register', userId});
     };
 
@@ -64,6 +62,10 @@ export default function App({wsPort}) {
         //when the other user rejects the call
         case 'cancelCall':
           handleCancelCall(data);
+
+        //when the other user rejects the call
+        case 'rejectCall':
+          handleRejectCall(data);
 
         //when the other user ends the call
         case 'endCall':
@@ -111,6 +113,13 @@ export default function App({wsPort}) {
     };
 
     const handleCancelCall = data => {
+      peerConnection.current.close();
+      setlocalStream(null);
+      setType('JOIN');
+      createPeerConnection();
+    };
+
+    const handleRejectCall = data => {
       peerConnection.current.close();
       setlocalStream(null);
       setType('JOIN');
@@ -261,6 +270,18 @@ export default function App({wsPort}) {
     setType('JOIN');
   }
 
+  async function processReject() {
+    peerConnection.current.close();
+    send({
+      type: 'rejectCall',
+      otherUserId: otherUserId.current,
+    });
+    otherUserId.current = null;
+    setlocalStream(null);
+    createPeerConnection();
+    setType('JOIN');
+  }
+
   function switchCamera() {
     localStream.getVideoTracks().forEach(track => {
       track._switchCamera();
@@ -311,6 +332,7 @@ export default function App({wsPort}) {
         <IncomingCallScreen
           otherUserId={otherUserId.current}
           processAccept={processAccept}
+          processReject={processReject}
         />
       );
     case 'OUTGOING_CALL':

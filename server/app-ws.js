@@ -26,6 +26,8 @@ function onMessage(ws, data) {
         break;
       case 'cancelCall':
         clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
+      case 'rejectCall':
+        clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
       case 'endCall':
         clients[parsedData.otherUserId]?.send(JSON.stringify(parsedData));
         break;
