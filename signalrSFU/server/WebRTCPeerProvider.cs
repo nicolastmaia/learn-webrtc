@@ -36,13 +36,17 @@ namespace server
         {
             // enter ice configurations
             var config = new RTCConfiguration { iceServers = new List<RTCIceServer>() };
+
             //config.iceServers.Add(new RTCIceServer
             //{
-            //    urls = "",
+            //    urls = "stun:yourserver.net.br", // stun URL here
             //});
+            //
             //config.iceServers.Add(new RTCIceServer
             //{
-            //    urls = "",
+            //    urls = "turn:yourserver.net.br", // turn URL here
+            //
+            //    // turn credentials below
             //    username = "",
             //    credentialType = RTCIceCredentialType.password,
             //    credential = ""
