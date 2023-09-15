@@ -1,7 +1,12 @@
 # WebRTC React Native App with Websocket Signaling
-This project was born from the need of using **webrtc** in a **react-native** app while having the signaling done via **websocket**.
+This project was born from the need of using **webrtc** in a **react-native** app.
+In my Use Case it was also necessary to write a server that would work both as a signaling server and as a Selective Forwarding Unit (SFU) for the audio to traverse through.
 
-It is a mix of two other projects I found online:
+I developed two versions of both the mobile app and the server to practice: 
+- one that uses **websocket** for signaling and the audio flows from one peer to the other DIRECTLY. The server is NodeJs and the client is React-Native.
+- one that uses **signalR** for signaling and the audio flows from one peer to the other through this server (peer <-> server <-> peer). The server is C#.Net 6 and and the client is React-Native.
+
+The websocket project is a mix of two other projects I found online:
 - one that uses socket.io for signaling and I WAS able to run; <--- [link](https://github.com/videosdk-live/webrtc/tree/main/react-native-webrtc-app)
 - and one that uses websocket for signaling but unfortunately I WASN'T able to run. <--- [link](https://github.com/skyrocketscommunity/React-native-webrtcApp)
 
