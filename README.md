@@ -1,4 +1,4 @@
-# WebRTC React Native App
+# Learn WebRTC #2
 This project was born from the need of using **webrtc** in a **react-native** app.  
 
 I developed two versions of both the mobile app and the server so I could practice with two different technologies: 
