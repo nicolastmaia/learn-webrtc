@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+
+<head>
+  <script type="text/javascript">
+    const WEBSOCKET_URL = "ws://127.0.0.1:8081/" // WEBSOCKER server URL
+
+    var pc, ws;
+
+    async function start() {
+      ws = new WebSocket(document.querySelector('#websockurl').value, []);
+
+      const config = {
+        iceServers: [{
+          urls: 'STUN_TURN_URL', // stun example: 'stun:stun.l.google.com:19302'; turn example: 'turn:numb.viagenie.ca:3478'
+          username: 'SERVER_USERNAME',
+          credentialType: "password",
+          credential: 'SERVER_PASSWORD'
+        }]
+      };
+
+      pc = new RTCPeerConnection(config);
+
+      pc.ontrack = evt => document.querySelector('#audioTag').srcObject = evt.streams[0];
+
+      pc.onicecandidate = evt => evt.candidate && ws.send(JSON.stringify(evt.candidate));
+
+      ws.onmessage = async function (evt) {
+        const obj = JSON.parse(evt.data);
+
+        if (obj?.candidate) {
+          pc.addIceCandidate(obj);
+        }
+        else if (obj?.sdp) {
+          await pc.setRemoteDescription(new RTCSessionDescription(obj));
+          pc.createAnswer()
+            .then((answer) => pc.setLocalDescription(answer))
+            .then(() => ws.send(JSON.stringify(pc.localDescription)));
+        }
+      };
+    };
+
+    async function closePeer() {
+      await pc?.close();
+      await ws?.close();
+    };
+
+  </script>
+</head>
+
+<body>
+
+  <audio controls autoplay="autoplay" id="audioTag" width="640" height="480"></audio>
+
+  <div>
+    <input type="text" id="websockurl" size="40" />
+    <button type="button" class="btn btn-success" onclick="start();">Start</button>
+    <button type="button" class="btn btn-success" onclick="closePeer();">Close</button>
+  </div>
+
+</body>
+
+<script>
+  document.querySelector('#websockurl').value = WEBSOCKET_URL;
+</script>
